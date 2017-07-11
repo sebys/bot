@@ -26,8 +26,8 @@ server.listen(process.env.port || process.env.PORT || 3978, function () {
 
 server.post('/api/messages', connector.listen());
 
-server.post('/api/auth/:address', function authorization(req, res, next){
-   bot.beginDialog(JSON.parse(req.params.address), "*:/resume", req.body.access_token);
+server.post('/api/auth', function authorization(req, res, next){
+   bot.beginDialog(JSON.parse(req.body.address), "*:/resume", req.body.access_token);
    res.send(200);
    return next();
 });
