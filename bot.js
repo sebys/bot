@@ -20,9 +20,7 @@ var bot = new builder.UniversalBot(connector);
 var server = restify.createServer();
 server.use(restify.bodyParser());
 
-var port = process.env.port || process.env.PORT || 3000;
-
-server.listen(port, function () {
+server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 
