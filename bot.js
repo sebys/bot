@@ -17,7 +17,9 @@ var bot = new builder.UniversalBot(connector);
 var server = restify.createServer();
 server.use(restify.bodyParser());
 
-server.listen(process.env.port || process.env.PORT || 3978, function () {
+var port = process.env.port || process.env.PORT || 3000;
+
+server.listen(port, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 
@@ -185,7 +187,7 @@ bot.dialog('/auth',[
 
         var sigingCard = new builder.SigninCard(session)
         .text("Please, login to LugLoc.")        
-        .button("Siging", `${signinUrl}?a=${addressParam}&e=${authUrl}`);
+        .button("Signin", `${signinUrl}?a=${addressParam}&e=${authUrl}`);
 
         var msj = new builder.Message(session).addAttachment(sigingCard);
         session.send(msj);
