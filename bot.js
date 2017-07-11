@@ -4,10 +4,13 @@ const dotenv = require('dotenv');
 const request = require("request");
 const querystring = require('querystring');
 
+// Para utilizar variables de entorno
+dotenv.config();
+
 // No te preocupes por estas credenciales por ahora, luego las usaremos para conectar los canales.
 var connector = new builder.ChatConnector({
-    appId: '',
-    appPassword: ''
+    appId: process.env.APP_ID,
+    appPassword: process.env.APP_KEY
 });
 
 // Ahora utilizamos un UniversalBot
@@ -31,8 +34,6 @@ server.post('/api/auth/:address', function authorization(req, res, next){
    return next();
 });
 
-// Para utilizar variables de entorno
-dotenv.config();
 
 let apiUrl = process.env.API_URL;
 let luisApp = process.env.LUIS_APP;
