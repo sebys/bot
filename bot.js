@@ -332,7 +332,7 @@ bot.dialog('/choise', [
 
 bot.dialog('/help', [
   function(session){
-      session.send("I currently response to a couple commands: 'wich are my devices?', 'where is my device?', 'what is the battery charge?', 'when my service plan expires?'.");
+      session.send("I currently response to a couple commands: 'which are my devices?', 'where is my device?', 'what is the battery charge?', 'when my service plan expires?'.");
       session.endDialog();
   }      
 ]).triggerAction({ matches: /^help$/});
