@@ -320,7 +320,7 @@ bot.dialog('/detail_serviceplan',[
 
 bot.dialog('/choise', [
     function (session, results) {
-        builder.Prompts.choice(session, 'The follow are your devices', session.userData.deviceChoises.slice(0, -1), { listStyle: builder.ListStyle.button });
+        builder.Prompts.choice(session, 'The follow are your devices', session.userData.deviceChoises, { listStyle: builder.ListStyle.button });
     },
     function (session, results) {
         //session.send("Wait a moment...");    
