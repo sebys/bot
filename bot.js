@@ -53,10 +53,50 @@ dialog.matches('wellcome', [
             session.beginDialog('/auth');
         } else {
             // TODO > Chequear si no tengo que volver a buscar los devices.
-            session.send('Wellcome! I am LugLoc bot. How can I help you?');   
+            session.send('Welcome! I am LugLoc bot.');   
+            session.send('How can I help you? Type Help to get more information.');
         }
     }
 ]);    
+
+dialog.matches('getDevices', [
+    function (session, args, next) {  
+        if(session.userData.access_token == undefined) {
+            session.beginDialog('/auth');
+        } 
+        else if(session.userData.devices == undefined ||
+                session.userData.devices == null ||
+                session.userData.devices.length == 0) {
+            session.send("I'm sorry, but you don't have any device.");
+            session.endDialog();
+        }
+        else  {
+            var cards = [];
+            session.userData.devices.forEach(function (item) {
+
+                var deviceName = item.DeviceName == null ? "Device " + item.DeviceId : item.DeviceName;
+                var photoUrl = item.IconUrl == null ? "http://is2.mzstatic.com/image/thumb/Purple117/v4/98/6d/09/986d09e3-5aef-50fa-c282-fc96c77dfacf/source/200x200bb.jpg" : item.IconUrl;
+
+                var deviceCard = new builder.HeroCard(session)
+                .title(deviceName)
+                .subtitle('Device identifier: ' + item.DeviceId)
+                .text('The current device status is ' + item.Status + '.')
+                .images([
+                    builder.CardImage.create(session, photoUrl)
+                ])
+                .buttons([
+                    builder.CardAction.openUrl(session, 'https://shop.lugloc.com/', 'Get a Service Plan')
+                ]);
+
+                cards.push(deviceCard);
+            });
+
+            // Adjuntamos la tarjeta al mensaje
+            var msj = new builder.Message(session).attachmentLayout(builder.AttachmentLayout.carousel).attachments(cards);
+            session.send(msj);
+        }
+    }
+]);
 
 dialog.matches('findDevice', [
     function (session, args, next) {  
@@ -71,7 +111,7 @@ dialog.matches('findDevice', [
         }
         else if(session.userData.devices.length == 1) {            
             session.userData.currentDevice = session.userData.devices[0];
-            session.beginDialog('/detail');
+            session.beginDialog('/location');
         }
         else {
             // Buscar el device por nombre si fue especificado.
@@ -89,10 +129,10 @@ dialog.matches('findDevice', [
                 } else {
                     session.send("A moment, please...");        
                     session.userData.currentDevice = findedDevice;
-                    session.beginDialog('/detail');                    
+                    session.beginDialog('/location');                    
                 }                
             } else {
-                session.userData.resumeInDialog = "/detail";
+                session.userData.resumeInDialog = "/location";
                 session.send("You have many devices, chosee one please!");
                 session.beginDialog('/choise');
             }
@@ -178,20 +218,19 @@ dialog.matches('servicePlan', [
     }
 ]);
 
-
 bot.dialog('/auth',[
     function (session, results, next) {
         const currentAddress = session.message.address;
 
         const addressParam = querystring.escape(JSON.stringify(currentAddress));        
 
-        session.send('Wellcome! I am LugLoc bot and I need you to authenticate first.');   
+        session.send('Welcome! I am LugLoc bot and I need you to authenticate first.');   
 
-        var sigingCard = new builder.SigninCard(session)
+        var signinCard = new builder.SigninCard(session)
         .text("Please, login to LugLoc.")        
         .button("Signin", `${signinUrl}?a=${addressParam}&e=${authUrl}`);
 
-        var msj = new builder.Message(session).addAttachment(sigingCard);
+        var msj = new builder.Message(session).addAttachment(signinCard);
         session.send(msj);
         session.endDialog();   
     }
@@ -217,28 +256,36 @@ bot.dialog('/resume', [
                 session.userData.deviceChoises = devices.slice(0, -1);
             }
 
-            session.send("How can I help you?");   
-            session.endDialog();   
+            session.send("Now we are ready!");
+            session.send("How can I help you? Type Help to get more information.");
+            session.endDialog();
         });
     }    
 ]);
 
-bot.dialog('/detail',[
+bot.dialog('/location',[
     function (session, results, next) {
-        // TODO > Tener presente que puede no tener last position!
+        
         if(session.userData.currentDevice != undefined && session.userData.currentDevice != null)
         {
-            var heroCard = new builder.HeroCard(session)
-                            .title(`Device ${session.userData.currentDevice.DeviceName}`)
-                            .subtitle('We found your device')
-                            .text(`The last position was ${session.userData.currentDevice.LastLocationGeneralDescription},
-                                ${session.userData.currentDevice.LastLocationSpecificDescription} on ${session.userData.currentDevice.LastPositionUpdate}`)
-                            .images([
-                                builder.CardImage.create(session, session.userData.currentDevice.LastLocationPhotoUrl)
-                            ]);
+            if(session.userData.currentDevice.LastPositionUpdate != null){
+                var positionDate = new Date(session.userData.currentDevice.LastPositionUpdate);
 
-            var msj = new builder.Message(session).addAttachment(heroCard);
-            session.send(msj);            
+                var heroCard = new builder.HeroCard(session)
+                                .title(`${session.userData.currentDevice.LastLocationGeneralDescription}`)
+                                .subtitle(`${session.userData.currentDevice.DeviceName} device.`)
+                                .text(`The last location was ${session.userData.currentDevice.LastLocationGeneralDescription},
+                                    ${session.userData.currentDevice.LastLocationSpecificDescription} on ${positionDate.toUTCString()}`)
+                                .images([
+                                    builder.CardImage.create(session, session.userData.currentDevice.LastLocationPhotoUrl)
+                                ]);
+
+                var msj = new builder.Message(session).addAttachment(heroCard);
+                session.send(msj);      
+            }
+            else {
+                session.send("Your device do not register any locations.");
+            }      
         }
 
         session.endDialog();
@@ -249,8 +296,9 @@ bot.dialog('/detail_battery',[
     function (session, results, next) {
         // TODO > Tener presente que puede no tener last position!
         if(session.userData.currentDevice != undefined && session.userData.currentDevice != null)
-        {            
-            session.send(`The last battery level was ${session.userData.currentDevice.Battery} on ${session.userData.currentDevice.LastBatteryUpdate}`);            
+        {  
+            var batteryDate = new Date(session.userData.currentDevice.LastBatteryUpdate);          
+            session.send(`The last battery level was ${session.userData.currentDevice.Battery} on ${batteryDate.toUTCString()}`);            
         }
 
         session.endDialog();
@@ -262,7 +310,8 @@ bot.dialog('/detail_serviceplan',[
         if(session.userData.currentDevice != undefined && session.userData.currentDevice != null)
         {    
             // Validar que si esta expirado recominde comprar uno nuevo. 
-            session.send(`Your service plan expire on ${session.userData.currentDevice.TracesExpirationDate}`);            
+            var tracesExpirationDate = new Date(session.userData.currentDevice.TracesExpirationDate);  
+            session.send(`Your service plan expire on ${tracesExpirationDate.toUTCString()}`);            
         }
 
         session.endDialog();
@@ -280,6 +329,13 @@ bot.dialog('/choise', [
         session.beginDialog(session.userData.resumeInDialog);
     } 
 ]);
+
+bot.dialog('/help', [
+  function(session){
+      session.send("I currently response to a couple commands: 'wich are my devices?', 'where is my device?', 'what is the battery charge?', 'when my service plan expires?'.");
+      session.endDialog();
+  }      
+]).triggerAction({ matches: /^help$/});
 
 var getDevices = function(token, callback) {
     var options = { 
