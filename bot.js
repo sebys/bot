@@ -271,15 +271,18 @@ bot.dialog('/location',[
             if(session.userData.currentDevice.LastPositionUpdate != null){
                 var positionDate = new Date(session.userData.currentDevice.LastPositionUpdate);
 
+                var map = `https://maps.googleapis.com/maps/api/staticmap?center=${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&markers=color:red%7Clabel:L%7C${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&zoom=12&size=400x240&key=AIzaSyC79cFp_6wtIQ79Osh4cSOjdkZd5r5h19o`;
+                
                 var heroCard = new builder.HeroCard(session)
                                 .title(`${session.userData.currentDevice.LastLocationGeneralDescription}`)
                                 .subtitle(`${session.userData.currentDevice.DeviceName} device.`)
                                 .text(`The last location was ${session.userData.currentDevice.LastLocationGeneralDescription},
                                     ${session.userData.currentDevice.LastLocationSpecificDescription} on ${positionDate.toUTCString()}`)
                                 .images([
-                                    builder.CardImage.create(session, session.userData.currentDevice.LastLocationPhotoUrl)
+                                    builder.CardImage.create(session, map)
+                                    
                                 ]);
-
+                                
                 var msj = new builder.Message(session).addAttachment(heroCard);
                 session.send(msj);      
             }
