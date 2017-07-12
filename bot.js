@@ -309,7 +309,7 @@ bot.dialog('/detail_serviceplan',[
     function (session, results, next) {        
         if(session.userData.currentDevice != undefined && session.userData.currentDevice != null)
         {    
-            // Validar que si esta expirado recominde comprar uno nuevo. 
+            // TODO > Validar que si esta expirado recominde comprar uno nuevo. 
             var tracesExpirationDate = new Date(session.userData.currentDevice.TracesExpirationDate);  
             session.send(`Your service plan expire on ${tracesExpirationDate.toUTCString()}`);            
         }
@@ -336,6 +336,30 @@ bot.dialog('/help', [
       session.endDialog();
   }      
 ]).triggerAction({ matches: /^help$/});
+
+bot.dialog('/refresh', [
+  function(session){
+        getDevices(session.userData.access_token, function(response){
+            if(response == null){
+                session.userData.devices = null;
+            }
+            else {  
+                session.userData.devices = [];              
+                var devices = "";
+
+                response.forEach(function (item) {
+                    session.userData.devices.push(item);
+                    devices = devices + item.DeviceId + "|";
+                });
+
+                session.userData.deviceChoises = devices.slice(0, -1);
+            }
+
+            session.send(";)");
+            session.endDialog();
+        });
+  }      
+]).triggerAction({ matches: /^refresh$/});
 
 var getDevices = function(token, callback) {
     var options = { 
