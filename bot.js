@@ -76,9 +76,12 @@ dialog.matches('findDevice', [
         else {
             // Buscar el device por nombre si fue especificado.
             var deviceNames = builder.EntityRecognizer.findAllEntities(args.entities, 'deviceName');
+
+            if(deviceNames.length == 0)
+                deviceNames = builder.EntityRecognizer.findAllEntities(args.entities, 'deviceNameSimple');
             
-            if(deviceNames.length > 0){            
-                var findedDevice = session.userData.devices.find(o => o.DeviceName === deviceNames[0].entity);
+            if(deviceNames.length > 0){
+                var findedDevice = session.userData.devices.find(o => o.DeviceName === deviceNames[0].entity.toLowerCase());
 
                 if(findedDevice == undefined || findedDevice == null){
                     session.send("I'm sorry but no finded devices with this name. Please, try with other name.");
