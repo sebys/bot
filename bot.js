@@ -133,7 +133,7 @@ dialog.matches('findDevice', [
                 }                
             } else {
                 session.userData.resumeInDialog = "/location";
-                session.send("You have many devices, chosee one please!");
+                session.send("You have many devices, choose one please!");
                 session.beginDialog('/choise');
             }
         }
@@ -172,7 +172,7 @@ dialog.matches('getBattery', [
                 }                
             } else {
                 session.userData.resumeInDialog = "/detail_battery";
-                session.send("You have many devices, chosee one please!");
+                session.send("You have many devices, choose one please!");
                 session.beginDialog('/choise');
             }
         }
@@ -211,7 +211,7 @@ dialog.matches('servicePlan', [
                 }                
             } else {
                 session.userData.resumeInDialog = "/detail_serviceplan";
-                session.send("You have many devices, chosee one please!");
+                session.send("You have many devices, choose one please!");
                 session.beginDialog('/choise');
             }
         }
@@ -320,7 +320,7 @@ bot.dialog('/detail_serviceplan',[
 
 bot.dialog('/choise', [
     function (session, results) {
-        builder.Prompts.choice(session, 'Choise a device', session.userData.deviceChoises.slice(0, -1), { listStyle: builder.ListStyle.button });
+        builder.Prompts.choice(session, 'The follow are your devices', session.userData.deviceChoises.slice(0, -1), { listStyle: builder.ListStyle.button });
     },
     function (session, results) {
         //session.send("Wait a moment...");    
