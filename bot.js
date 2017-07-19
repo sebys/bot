@@ -272,7 +272,7 @@ bot.dialog('/location',[
             if(session.userData.currentDevice.LastPositionUpdate != null){
                 var positionDate = new Date(session.userData.currentDevice.LastPositionUpdate);
 
-                var map = `https://maps.googleapis.com/maps/api/staticmap?center=${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&markers=color:red%7Clabel:L%7C${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&zoom=12&size=400x240&key=${}`;
+                var map = `https://maps.googleapis.com/maps/api/staticmap?center=${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&markers=color:red%7Clabel:L%7C${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&zoom=12&size=400x240&key=${mapKey}`;
                 
                 var heroCard = new builder.HeroCard(session)
                                 .title(`${session.userData.currentDevice.LastLocationGeneralDescription}`)
