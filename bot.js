@@ -38,6 +38,7 @@ let luisApp = process.env.LUIS_APP;
 let luisKey = process.env.LUIS_KEY;
 let signinUrl = process.env.SIGNIN_URL;
 let authUrl = process.env.BOT_AUTH_URL;
+let mapKey = process.env.MAPS_KEY;
 
 var model = `https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/${luisApp}?subscription-key=${luisKey}&timezoneOffset=0&verbose=true`;
 
@@ -271,7 +272,7 @@ bot.dialog('/location',[
             if(session.userData.currentDevice.LastPositionUpdate != null){
                 var positionDate = new Date(session.userData.currentDevice.LastPositionUpdate);
 
-                var map = `https://maps.googleapis.com/maps/api/staticmap?center=${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&markers=color:red%7Clabel:L%7C${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&zoom=12&size=400x240&key=AIzaSyC79cFp_6wtIQ79Osh4cSOjdkZd5r5h19o`;
+                var map = `https://maps.googleapis.com/maps/api/staticmap?center=${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&markers=color:red%7Clabel:L%7C${session.userData.currentDevice.LastLatitude},${session.userData.currentDevice.LastLongitude}&zoom=12&size=400x240&key=${}`;
                 
                 var heroCard = new builder.HeroCard(session)
                                 .title(`${session.userData.currentDevice.LastLocationGeneralDescription}`)
